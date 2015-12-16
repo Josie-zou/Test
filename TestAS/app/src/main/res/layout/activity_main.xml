@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.josie.testas.MainActivity"
+    android:orientation="vertical">
+       <!--<ImageButton-->
+           <!--android:id="@+id/me_imgbttn"-->
+           <!--android:layout_margin="5dp"-->
+
+           <!--android:layout_alignParentLeft="true"-->
+           <!--android:background="@drawable/me"-->
+           <!--android:layout_width="wrap_content"-->
+           <!--android:layout_height="wrap_content" />-->
+       <!--<ImageButton-->
+           <!--android:id="@+id/sign_in_imgbttn"-->
+           <!--android:layout_margin="5dp"-->
+           <!--android:layout_alignParentRight="true"-->
+           <!--android:background="@drawable/sign_in"-->
+           <!--android:layout_width="wrap_content"-->
+           <!--android:layout_height="wrap_content" />-->
+       <android.support.v7.widget.Toolbar
+           android:id="@+id/main_toolbar"
+           android:background="#339999"
+           android:elevation="4dp"
+           android:layout_width="match_parent"
+           android:layout_height="?attr/actionBarSize">
+       </android.support.v7.widget.Toolbar>
+
+    <com.race604.flyrefresh.FlyRefreshLayout
+        android:id="@+id/fly_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/m_recycleview"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="30dp"
+            android:background="#EAEAEA"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </com.race604.flyrefresh.FlyRefreshLayout>
+    <!--<android.support.v7.widget.Toolbar-->
+        <!--android:id="@+id/main_toolbar"-->
+        <!--android:background="#339999"-->
+        <!--android:elevation="4dp"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="?attr/actionBarSize">-->
+    <!--</android.support.v7.widget.Toolbar>-->
+
+
+</LinearLayout>

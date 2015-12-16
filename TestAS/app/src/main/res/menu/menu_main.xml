@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.josie.testas.MainActivity">
+    <item
+        android:id="@+id/action_me"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:icon="@drawable/sign_in"
+        app:showAsAction = "always">
+    </item>
+    <item
+        android:id="@+id/action_setting"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        android:icon="@drawable/setting_icon"
+        app:showAsAction = "ifRoom">
+    </item>
+
+</menu>
