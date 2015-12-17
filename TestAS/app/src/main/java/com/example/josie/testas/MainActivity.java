@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.renderscript.Allocation;
@@ -36,6 +37,9 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.race604.flyrefresh.FlyRefreshLayout;
 
 import java.util.ArrayList;
@@ -46,7 +50,7 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private FlyRefreshLayout flyRefreshLayout;
-//    private ImageButton mebttn;
+    //    private ImageButton mebttn;
 //    private ImageButton signbttn;
     private RecyclerView recyclerView;
     private List<TimeModel> list;
@@ -59,7 +63,12 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
     private int totalItemCount;
     private int pastItems;
     private int visibleThreshold = 5;
-    private boolean onLoading = false;
+//    private boolean onLoading = false;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,28 +97,32 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
 //        addBlur();
         Log.e("start", "start");
         recyclerView.setAdapter(timeLineAdapter);
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                visibleItemCount = linearLayoutManager.getChildCount();
-//                totalItemCount = linearLayoutManager.getItemCount();
-//                pastItems = linearLayoutManager.findFirstVisibleItemPosition();
-//                if (!onLoading){
-//                    if ((pastItems + visibleItemCount) >= totalItemCount){
-//                        Toast.makeText(MainActivity.this, "loading...", Toast.LENGTH_SHORT ).show();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                visibleItemCount = linearLayoutManager.getChildCount();
+                totalItemCount = linearLayoutManager.getItemCount();
+                pastItems = linearLayoutManager.findFirstVisibleItemPosition();
+//                if (!onLoading) {
+                //设置提前加载
+                    if ((pastItems + visibleItemCount) >= totalItemCount-2) {
+//                        Toast.makeText(MainActivity.this, "loading...", Toast.LENGTH_SHORT).show();
 //                        onLoading = true;
-//                        loadmoredata();
-//                        //TODO
-//                    }
+                        loadmoredata();
+                        //TODO
+                    }
 //                }
-//                if (onLoading && ((totalItemCount - visibleItemCount) == (pastItems + visibleItemCount))){
-//                    onLoading = true;
+//                if (onLoading && ((totalItemCount - visibleItemCount - 2) == (pastItems + visibleItemCount))) {
+//                    onLoading = false;
 //                }
-//            }
-//        });
+            }
+        });
 
 
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void loadmoredata() {
@@ -117,19 +130,29 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
             @Override
             public void run() {
                 list = getnewdata(list);
+//                timeLineAdapter.notifyItemInserted(totalItemCount);
                 timeLineAdapter.notifyDataSetChanged();
-                linearLayoutManager.scrollToPosition(0);
+                linearLayoutManager.scrollToPosition(totalItemCount);
             }
         }, 1000);
     }
 
     private List<TimeModel> getnewdata(List<TimeModel> list) {
-        if (list == null){
+        if (list == null) {
             list = new ArrayList<TimeModel>();
         }
-        list.add(new TimeModel("zouzhili","hahahahha","dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili","hahahahha","dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili","hahahahha","dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
+        list.add(new TimeModel("zouzhili", "hahahahha", "lalalallalal"));
+
+
 
         return list;
     }
@@ -152,47 +175,46 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
     }
 
     private void addBlur() {
-       linearLayout.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-           @Override
-           public boolean onPreDraw() {
+        linearLayout.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
 //               linearLayout.getViewTreeObserver().removeOnPreDrawListener(this);
 //               linearLayout.buildDrawingCache();;
-               Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.a);
-               blur(bitmap, linearLayout);
-               return  true;
-           }
-       });
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.a);
+                blur(bitmap, linearLayout);
+                return true;
+            }
+        });
     }
-
 
 
     private void initData() {
         list = new ArrayList<TimeModel>();
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:25:00"));
-        list.add(new TimeModel( "任立翔", "gsghsg,jsdifdfgdf", "2015.12.12 20:26:00"));
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:27:00"));
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:28:00"));
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:29:00"));
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:30:00"));
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:31:00"));
-//        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:32:00"));
-//        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:33:00"));
-//        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:34:00"));
+        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:25:00"));
+        list.add(new TimeModel("任立翔", "gsghsg,jsdifdfgdf", "2015.12.12 20:26:00"));
+        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:27:00"));
+        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:28:00"));
+        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:29:00"));
+        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:30:00"));
+        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:31:00"));
+        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:32:00"));
+        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:33:00"));
+        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:34:00"));
 //        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:35:00"));
 
-        Log.e("list",list.toString());
+        Log.e("list", list.toString());
 
     }
 
     private void initView() {
-        linearLayout = (LinearLayout)findViewById(R.id.main_layout);
-        flyRefreshLayout = (FlyRefreshLayout)findViewById(R.id.fly_layout);
-        recyclerView = (RecyclerView)findViewById(R.id.m_recycleview);
+        linearLayout = (LinearLayout) findViewById(R.id.main_layout);
+        flyRefreshLayout = (FlyRefreshLayout) findViewById(R.id.fly_layout);
+        recyclerView = (RecyclerView) findViewById(R.id.m_recycleview);
         linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
-        timeLineAdapter = new GalleryAdapter(this,list);
-        toolbar = (Toolbar)findViewById(R.id.main_toolbar);
+        timeLineAdapter = new GalleryAdapter(this, list);
+        toolbar = (Toolbar) findViewById(R.id.main_toolbar);
 //        listView.setAdapter(timeLineAdapter);
 
 //        mebttn = (ImageButton)findViewById(R.id.me_imgbttn);
@@ -231,7 +253,8 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
 
         return super.onOptionsItemSelected(item);
     }
-    private void  blur(Bitmap bkg, View view) {
+
+    private void blur(Bitmap bkg, View view) {
         long startMs = System.currentTimeMillis();
         float scaleFactor = 8;
         float radius = 20;
@@ -269,7 +292,7 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
     @Override
     public void onRefresh(FlyRefreshLayout view) {
         View child = recyclerView.getChildAt(0);
-        if (child != null){
+        if (child != null) {
             //TODO
             //需要添加刷新操作，更新recycleview
         }
@@ -286,17 +309,59 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
     }
 
 
-//    动画结束的的时候更新数据
+    //    动画结束的的时候更新数据
     @Override
     public void onRefreshAnimationEnd(FlyRefreshLayout view) {
-        Log.e("hello","loading?");
-        Toast.makeText(getApplicationContext(), "loading", Toast.LENGTH_SHORT).show();
-        loadmoredata();
+        Log.e("hello", "loading?");
+        //TODO
+        //更新数据源
+//        Toast.makeText(getApplicationContext(), "loading", Toast.LENGTH_SHORT).show();
+//        loadmoredata();
     }
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
         return false;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.example.josie.testas/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://com.example.josie.testas/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
     }
 }

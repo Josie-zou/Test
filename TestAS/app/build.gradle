@@ -28,4 +28,5 @@ dependencies {
 
 dependencies{
     compile 'com.race604.flyrefresh:library:2.0.0'
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }

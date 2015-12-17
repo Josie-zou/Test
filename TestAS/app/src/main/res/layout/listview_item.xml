@@ -27,7 +27,7 @@
         <View
             android:layout_width="2dp"
             android:layout_marginLeft="25dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@color/item_color">
         </View>
         <ImageView
