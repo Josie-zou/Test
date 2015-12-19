@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.josie.testas.MetaballView
+    <com.example.josie.testas.UI.MetaballView
         android:id="@+id/load_metaball"
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
