@@ -6,10 +6,11 @@ android {
 
     defaultConfig {
         applicationId "com.example.josie.testas"
-        minSdkVersion 17
+        minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -28,5 +29,6 @@ dependencies {
 
 dependencies{
     compile 'com.race604.flyrefresh:library:2.0.0'
+    compile 'fr.tvbarthel.blurdialogfragment:lib:2.1.5'
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }

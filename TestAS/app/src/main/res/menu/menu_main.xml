@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.josie.testas.MainActivity">
     <item
-        android:id="@+id/action_me"
+        android:id="@+id/sign_in"
         android:title="@string/action_settings"
         android:orderInCategory="100"
-        android:icon="@drawable/sign_in"
+        android:icon="@drawable/qiandao"
         app:showAsAction = "always">
     </item>
     <item

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.josie.testas.Adapter.GalleryAdapter;
 import com.example.josie.testas.Model.TimeModel;
+import com.example.josie.testas.UI.DialogFragment;
 import com.example.josie.testas.UI.FastBlur;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -48,7 +50,9 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
     private int visibleItemCount;
     private int totalItemCount;
     private int pastItems;
-    private int visibleThreshold = 5;
+    private MenuItem menuItem;
+    private boolean ifsign_in = true;
+//    private int visibleThreshold = 5;
 //    private boolean onLoading = false;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -222,6 +226,8 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        menuItem = menu.findItem(R.id.sign_in);
+
         return true;
     }
 
@@ -307,16 +313,39 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
+        switch (item.getItemId()){
+            case R.id.sign_in:
+                if (ifsign_in){
+                    menuItem.setIcon(R.drawable.qiantui);
+                    ifsign_in = false;
+                    Toast.makeText(getApplicationContext(),"sign_in", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    DialogFragment dialogFragment = DialogFragment.newInstance(4, 5.0f,true,true);
+                    dialogFragment.show(getFragmentManager(), "sign up");
+//                    Toast.makeText(getApplicationContext(),"sign_up", Toast.LENGTH_SHORT).show();
+//                    Runnable runnable = new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            DialogFragment dialogFragment = new DialogFragment();
+//                            dialogFragment.show(getFragmentManager(), "Sign Up");
+//                        }
+//                    };
+//
+                }
+                break;
+            case R.id.action_setting:
+                Toast.makeText(getApplicationContext(),"setting", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
         return false;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
         Action viewAction = Action.newAction(
                 Action.TYPE_VIEW, // TODO: choose an action type.
