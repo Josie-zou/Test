@@ -29,6 +29,9 @@ dependencies {
 
 dependencies{
     compile 'com.race604.flyrefresh:library:2.0.0'
+    compile 'com.mcxiaoke.volley:library:1.0.19'
+    compile 'com.alibaba:fastjson:1.1.46.android'
     compile 'fr.tvbarthel.blurdialogfragment:lib:2.1.5'
+    compile 'org.apache.httpcomponents:httpclient:4.5.1'
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }

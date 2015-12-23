@@ -6,4 +6,6 @@
     <color name="namecolor">#3399cc</color>
     <color name="timecolor">#ccccff</color>
     <color name="item_color">#cccccc</color>
+    <color name="deepblue">#3399cc</color>
+    <color name="highblue">#ccffCC</color>
 </resources>

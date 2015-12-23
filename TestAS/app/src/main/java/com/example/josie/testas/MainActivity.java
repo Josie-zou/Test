@@ -1,5 +1,7 @@
 package com.example.josie.testas;
 
+import android.annotation.TargetApi;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -7,8 +9,10 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,7 +26,17 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.josie.testas.Activity.AboutMe;
+import com.example.josie.testas.Activity.newads;
 import com.example.josie.testas.Adapter.GalleryAdapter;
+import com.example.josie.testas.Model.Notice;
+import com.example.josie.testas.Model.Student;
 import com.example.josie.testas.Model.TimeModel;
 import com.example.josie.testas.UI.DialogFragment;
 import com.example.josie.testas.UI.FastBlur;
@@ -31,17 +45,23 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.race604.flyrefresh.FlyRefreshLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.OnPullRefreshListener, Toolbar.OnMenuItemClickListener {
 
     private SwipeRefreshLayout swipeRefreshLayout;
     private FlyRefreshLayout flyRefreshLayout;
-    //    private ImageButton mebttn;
-//    private ImageButton signbttn;
+    private FloatingActionButton actionButton;
     private RecyclerView recyclerView;
-    private List<TimeModel> list;
+    private List<Notice> noticeList;
     private GalleryAdapter timeLineAdapter;
     private LinearLayout linearLayout;
     private LinearLayoutManager linearLayoutManager;
@@ -52,6 +72,9 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
     private int pastItems;
     private MenuItem menuItem;
     private boolean ifsign_in = true;
+    private Student student;
+    private String token;
+    private RequestQueue requestQueue;
 //    private int visibleThreshold = 5;
 //    private boolean onLoading = false;
     /**
@@ -65,6 +88,11 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
         super.onCreate(savedInstanceState);
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        Intent intent = getIntent();
+        student = (Student) (Student) intent.getSerializableExtra("StudentInfo");
+        Log.e("student", student.toString());
+        token = student.getAccessToken();
+        requestQueue = Volley.newRequestQueue(this);
 
         initData();
         initView();
@@ -80,8 +108,10 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("home", "home");
-                Toast.makeText(MainActivity.this, "Home", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, AboutMe.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+//                finish();
             }
         });
 //        addBlur();
@@ -99,7 +129,12 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
                     if ((pastItems + visibleItemCount) >= totalItemCount-2) {
 //                        Toast.makeText(MainActivity.this, "loading...", Toast.LENGTH_SHORT).show();
 //                        onLoading = true;
-                        loadmoredata();
+                        if (noticeList == null){
+                            Toast.makeText(getApplicationContext(), "loading...", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            loadmoredata();
+                        }
                         //TODO
                     }
 //                }
@@ -119,7 +154,7 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                list = getnewdata(list);
+                noticeList = getnewdata(noticeList);
 //                timeLineAdapter.notifyItemInserted(totalItemCount);
                 timeLineAdapter.notifyDataSetChanged();
                 linearLayoutManager.scrollToPosition(totalItemCount);
@@ -127,24 +162,43 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
         }, 1000);
     }
 
-    private List<TimeModel> getnewdata(List<TimeModel> list) {
+    private List<Notice> getnewdata(List<Notice> list) {
         if (list == null) {
-            list = new ArrayList<TimeModel>();
+            list = new ArrayList<Notice>();
         }
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "dfjsiodjfsdoig"));
-        list.add(new TimeModel("zouzhili", "hahahahha", "lalalallalal"));
+        JsonObjectRequest getMoreRequest = null;
+        final String token = student.getAccessToken();
+        String stringUrl = "http://192.168.56.1:8080/TimeZone/notice/0?accessToken=" + token;;
+        getMoreRequest = new JsonObjectRequest(Request.Method.GET, stringUrl, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.e("dongtai", response.toString());
+                try {
+                    JSONArray noticeJson = response.getJSONArray("notices");
+                    for (int i = 0; i < noticeJson.length(); i ++){
+                        JSONObject jsonObject = noticeJson.getJSONObject(i);
+                        Notice notice = new Notice();
+                        notice.setAccessToken(token);
+                        notice.setContent(jsonObject.getString("content"));
+                        notice.setDate(convertToDate(jsonObject.getString("date")));
+                        notice.setId(jsonObject.getInt("id"));
+                        notice.setStuName(jsonObject.getString("stuID"));
+                        noticeList.add(notice);
+                    }
 
-
-
-        return list;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("dongtai", "dongtaierror");
+            }
+        });
+        requestQueue.add(getMoreRequest);
+        Log.e("notices", noticeList.toString());
+         return list;
     }
 
     private void initToolbar() {
@@ -179,31 +233,61 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
 
 
     private void initData() {
-        list = new ArrayList<TimeModel>();
-        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:25:00"));
-        list.add(new TimeModel("任立翔", "gsghsg,jsdifdfgdf", "2015.12.12 20:26:00"));
-        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:27:00"));
-        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:28:00"));
-        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:29:00"));
-        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:30:00"));
-        list.add(new TimeModel("任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:31:00"));
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:32:00"));
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:33:00"));
-        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:34:00"));
-//        list.add(new TimeModel( "任立翔", "woainiwoainiwoainiwoainiwoaini", "2015.12.12 20:35:00"));
+        noticeList = new ArrayList<Notice>();
+        JsonObjectRequest firstnoticeRequest = null;
+        Log.e("token", token);
+        String stringUrl = "http://192.168.56.1:8080/TimeZone/notice?accessToken=" + token;
+        Log.e("stringURL",stringUrl);
+        firstnoticeRequest = new JsonObjectRequest(Request.Method.GET, stringUrl, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.e("dongtai", response.toString());
+                try {
+                    JSONArray noticeJson = response.getJSONArray("notices");
+                    for (int i = 0; i < noticeJson.length(); i ++){
+                        JSONObject jsonObject = noticeJson.getJSONObject(i);
+                        Notice notice = new Notice();
+                        notice.setAccessToken(token);
+                        notice.setContent(jsonObject.getString("content"));
+                        String datetime = jsonObject.getString("date");
+                        String date = convertToDate(datetime);
+                        notice.setDate(date);
+                        notice.setStuName(jsonObject.getString("stuID"));
+                        notice.setId(jsonObject.getInt("id"));
+                        noticeList.add(notice);
+                    }
 
-        Log.e("list", list.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("dongtai", "dongtaierror");
+            }
+        });
+        requestQueue.add(firstnoticeRequest);
 
+        Log.e("notices", noticeList.toString());
+    }
+
+    private String convertToDate(String datetime) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = format.format(new Long(datetime));
+
+        return time ;
     }
 
     private void initView() {
         linearLayout = (LinearLayout) findViewById(R.id.main_layout);
+        actionButton = (FloatingActionButton)findViewById(R.id.action_add);
         flyRefreshLayout = (FlyRefreshLayout) findViewById(R.id.fly_layout);
         recyclerView = (RecyclerView) findViewById(R.id.m_recycleview);
         linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(linearLayoutManager);
-        timeLineAdapter = new GalleryAdapter(this, list);
+        timeLineAdapter = new GalleryAdapter(this, noticeList);
         toolbar = (Toolbar) findViewById(R.id.main_toolbar);
 //        listView.setAdapter(timeLineAdapter);
 
@@ -218,6 +302,17 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
         });
 
         flyRefreshLayout.setOnPullRefreshListener(this);
+        actionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO
+                //添加动态
+                Intent intent = new Intent(MainActivity.this, newads.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+//                finish();
+            }
+        });
 
 
     }
@@ -246,6 +341,7 @@ public class MainActivity extends ActionBarActivity implements FlyRefreshLayout.
         return super.onOptionsItemSelected(item);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void blur(Bitmap bkg, View view) {
         long startMs = System.currentTimeMillis();
         float scaleFactor = 8;

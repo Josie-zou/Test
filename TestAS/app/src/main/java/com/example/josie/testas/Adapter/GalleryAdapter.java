@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.josie.testas.Model.Notice;
 import com.example.josie.testas.R;
 import com.example.josie.testas.Model.TimeModel;
 import com.example.josie.testas.UI.MetaballView;
@@ -21,7 +22,7 @@ import java.util.List;
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
     private LayoutInflater inflater;
-    private List<TimeModel> listdata;
+    private List<Notice> listdata;
     private ViewHolder viewHolder;
     private OnItemClickLitener onItemClickLitener;
     private static final int TYPE_ITEM = 0;
@@ -44,7 +45,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         this.onItemClickLitener = onItemClickLitener;
     }
 
-    public GalleryAdapter(Context context, List<TimeModel> list){
+    public GalleryAdapter(Context context, List<Notice> list){
         inflater = LayoutInflater.from(context);
         listdata = list;
     }
@@ -80,9 +81,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
             Log.e("error" , String.valueOf(((ItemViewHolder) holder).contentTextview));
             holder.iconImageview.setImageResource(R.drawable.dongtai_yuandian);
 //        viewHolder.meImageview.setImageResource(listdata.get(position).getMeimageView());
-            holder.nameTextview.setText(listdata.get(position).getNametextview());
-            holder.contentTextview.setText(listdata.get(position).getContenttextview());
-            holder.timeTextview.setText(listdata.get(position).getTimetextview());
+            holder.nameTextview.setText(listdata.get(position).getStuName());
+            holder.contentTextview.setText(listdata.get(position).getContent());
+            holder.timeTextview.setText(listdata.get(position).getDate().toString());
 
 //            if (onItemClickLitener != null) {
 //                holder.itemView.setOnClickListener(new View.OnClickListener() {

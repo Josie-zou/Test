@@ -9,6 +9,7 @@ import android.widget.TextView;
 public class TimeModel {
 //    private int iconimageView;
     private String nametextview;
+    private int id;
     private String contenttextview;
     private String timetextview;
 
@@ -17,6 +18,10 @@ public class TimeModel {
         this.nametextview = nametextview;
         this.contenttextview = contenttextview;
         this.timetextview = timetextview;
+    }
+
+    public TimeModel() {
+
     }
 
 //    public int getIconimageView() {
